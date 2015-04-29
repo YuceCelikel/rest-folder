@@ -6,7 +6,7 @@ var config = {
   development: {
     root: rootPath,
     port: 3001,
-    folder: '/Mac/users/yucecelikel/Desktop/sharedfolder'
+    folder: '/Users/yucecelikel/Documents/sharedfolder'
   }
 };
 

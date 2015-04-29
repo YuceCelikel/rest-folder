@@ -1,14 +1,29 @@
 var config = require('./config/config'),
   fs = require('fs');
-  url = require('url');
+  url = require('url')
+  mkdirp = require('mkdirp');
 
 var saveFile = function(request, response) {
-  var writer = fs.createWriteStream("file.jpg");
-  request.pipe(writer);
+  var pathname = url.parse(request.url).pathname;
+  var fullPath = config.folder + pathname;
+  var folderName = fullPath.substring(0, fullPath.lastIndexOf("/"));
 
-  writer.on('finish', function() {
-    response.writeHead(201, { "Content-Type": "text/plain" });
-    response.end("created");
+  mkdirp(folderName, function(err) {
+    if(err) {
+      console.log(err);
+
+      response.writeHead(400, { "Content-Type": "text/plain" });
+      response.end();
+    }
+    else {
+      var writer = fs.createWriteStream(fullPath);
+      request.pipe(writer);
+
+      writer.on('finish', function() {
+        response.writeHead(201, { "Content-Type": "text/plain" });
+        response.end("created");
+      });
+    }
   });
 };
 
