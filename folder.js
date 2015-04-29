@@ -1,7 +1,8 @@
 var config = require('./config/config'),
   fs = require('fs');
   url = require('url')
-  mkdirp = require('mkdirp');
+  mkdirp = require('mkdirp')
+  path = require('path');
 
 var saveFile = function(request, response) {
   var pathname = url.parse(request.url).pathname;
@@ -27,8 +28,23 @@ var saveFile = function(request, response) {
   });
 };
 
+var getFile = function(request, response) {
+  var pathname = url.parse(request.url).pathname;
+  var fullPath = config.folder + pathname;
+  var filename = path.basename(fullPath);
+
+  response.setHeader('Content-disposition', 'attachment; filename=' + filename);
+  //res.setHeader('Content-type', mimetype);
+
+  var reader = fs.createReadStream(fullPath);
+  reader.pipe(response);
+};
+
 module.exports = function(request, response) {
   if(request.method == "POST") {
     saveFile(request, response);
+  }
+  else if(request.method == "GET") {
+    getFile(request, response);
   }
 }
