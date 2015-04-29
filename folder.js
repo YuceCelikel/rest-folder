@@ -1,7 +1,7 @@
 var config = require('./config/config'),
-  fs = require('fs');
-  url = require('url')
-  mkdirp = require('mkdirp')
+  fs = require('fs'),
+  url = require('url'),
+  mkdirp = require('mkdirp'),
   path = require('path');
 
 var saveFile = function(request, response) {
@@ -18,12 +18,13 @@ var saveFile = function(request, response) {
     }
     else {
       var writer = fs.createWriteStream(fullPath);
-      request.pipe(writer);
-
+      
       writer.on('finish', function() {
         response.writeHead(201, { "Content-Type": "text/plain" });
         response.end("created");
       });
+
+      request.pipe(writer);
     }
   });
 };
