@@ -2,7 +2,8 @@ var config = require('./config/config'),
   fs = require('fs'),
   url = require('url'),
   mkdirp = require('mkdirp'),
-  path = require('path');
+  path = require('path'),
+  glob = require('glob');
 
 var saveFile = function(request, response) {
   var pathname = url.parse(request.url).pathname;
@@ -49,7 +50,37 @@ var fileExists = function(request, response) {
     response.writeHead(exists? 200 : 404);
     response.end();
   });
-}
+};
+
+var deleteFile = function(request, response) {
+  var pathname = url.parse(request.url).pathname;
+  var fullPath = config.folder + pathname;
+
+  glob(fullPath + '*', null, function(err, files) {
+    var fileCount = files.length, processedCount = 0, totalDeletedCount = 0;
+
+    if(fileCount == 0) {
+      response.writeHead(400);
+      response.end();
+    }
+
+    for(var i=0;i<files.length;i++) {
+      var file = files[i];
+
+      fs.unlink(file, function(err) {
+        processedCount = processedCount + 1;
+
+        if(!err)
+          totalDeletedCount = totalDeletedCount + 1;
+
+        if(fileCount == processedCount) {
+          response.writeHead(fileCount == totalDeletedCount? 200 : 500);
+          response.end();
+        }
+      });
+    };
+  });
+};
 
 module.exports = function(request, response) {
   if(request.method == "POST") {
@@ -60,5 +91,8 @@ module.exports = function(request, response) {
   }
   else if(request.method == "HEAD") {
     fileExists(request, response);
+  }
+  else if(request.method == "DELETE") {
+    deleteFile(request, response);
   }
 }
