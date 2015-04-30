@@ -18,7 +18,7 @@ var saveFile = function(request, response) {
     }
     else {
       var writer = fs.createWriteStream(fullPath);
-      
+
       writer.on('finish', function() {
         response.writeHead(201, { "Content-Type": "text/plain" });
         response.end("created");
@@ -41,11 +41,24 @@ var getFile = function(request, response) {
   reader.pipe(response);
 };
 
+var fileExists = function(request, response) {
+  var pathname = url.parse(request.url).pathname;
+  var fullPath = config.folder + pathname;
+
+  fs.exists(fullPath, function(exists) {
+    response.writeHead(exists? 200 : 404);
+    response.end();
+  });
+}
+
 module.exports = function(request, response) {
   if(request.method == "POST") {
     saveFile(request, response);
   }
   else if(request.method == "GET") {
     getFile(request, response);
+  }
+  else if(request.method == "HEAD") {
+    fileExists(request, response);
   }
 }
