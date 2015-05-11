@@ -36,7 +36,7 @@ var getFile = function(request, response) {
   var filename = path.basename(fullPath);
 
   response.setHeader('Content-disposition', 'attachment; filename=' + filename);
-  //res.setHeader('Content-type', mimetype);
+  //res.setHeader('Content-type', mimetype); //yorum
 
   var reader = fs.createReadStream(fullPath);
   reader.on('error', function(error) {
