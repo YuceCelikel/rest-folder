@@ -39,6 +39,10 @@ var getFile = function(request, response) {
   //res.setHeader('Content-type', mimetype);
 
   var reader = fs.createReadStream(fullPath);
+  reader.on('error', function(error) {
+    response.writeHead(500);
+    response.end(error.message);
+  });
   reader.pipe(response);
 };
 
