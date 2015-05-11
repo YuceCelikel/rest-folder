@@ -40,8 +40,14 @@ var getFile = function(request, response) {
 
   var reader = fs.createReadStream(fullPath);
   reader.on('error', function(error) {
-    response.writeHead(500);
-    response.end(error.message);
+    if(error.code == "ENOENT") {
+      response.writeHead(404);
+      response.end();
+    }
+    else {
+      response.writeHead(500);
+      response.end(error.message);
+    }
   });
   reader.pipe(response);
 };
