@@ -40,7 +40,7 @@ var getFile = function(request, response) {
 
   var reader = fs.createReadStream(fullPath);
   reader.on('error', function(error) {
-    if(error.code == "ENOENT") {
+    if(error.code == "ENOENT" || error.code == "EISDIR") {
       response.writeHead(404);
       response.end();
     }
